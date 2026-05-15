@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:telephony/telephony.dart';
+import 'package:another_telephony/telephony.dart';
 import '../bridge/models.dart';
 
 class SmsService {
