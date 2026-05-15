@@ -6,9 +6,28 @@ This document outlines the protocol and methods for the Progressive Web App (PWA
 
 The AWA shell exposes a bidirectional JSON-RPC style bridge via `window.flutter_inappwebview.callHandler`. It uses `AWABridge` as the handler name.
 
-### JavaScript Wrapper
+### TypeScript Bridge Service
 
-Use the following wrapper to facilitate communication and handle graceful degradation when running outside the shell (e.g., in a desktop browser for local development).
+For modern web applications, a strongly-typed service `AWABridge.ts` is provided. This is the recommended way to integrate with the shell in production.
+
+```typescript
+import { AWABridge, AWABridgeError } from './AWABridge';
+
+async function captureAndUpload() {
+  try {
+    const photo = await AWABridge.takePhoto(90);
+    // photo.base64 or photo.path
+  } catch (err) {
+    if (err instanceof AWABridgeError) {
+       console.error(`Native Error [${err.code}]: ${err.message}`);
+    }
+  }
+}
+```
+
+### JavaScript Wrapper (Legacy/Simple)
+
+If you are not using TypeScript, you can use this simplified wrapper:
 
 ```javascript
 // awa_bridge.js
