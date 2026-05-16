@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# White-Label Engine temporary files
+android/key.properties
+flutter_launcher_icons.yaml
+assets/icon.png
+*.png
