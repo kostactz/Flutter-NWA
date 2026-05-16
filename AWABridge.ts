@@ -9,6 +9,7 @@
 export enum BridgeMethod {
   GetLocation = 'location.current',
   TakePhoto = 'media.camera',
+  PickFromGallery = 'media.gallery',
   PickFile = 'media.filePicker',
   SendSms = 'sms.send',
   ReceiveSms = 'sms.receive',
@@ -117,6 +118,7 @@ class AWABridgeService {
         });
       
       case BridgeMethod.TakePhoto:
+      case BridgeMethod.PickFromGallery:
       case BridgeMethod.PickFile:
         // For local dev, we could trigger a hidden <input type="file">
         console.log('AWABridge: Mocking file selection for local development.');
@@ -148,10 +150,19 @@ class AWABridgeService {
   }
 
   /**
-   * Opens the native file picker.
+   * Opens the device gallery to select a photo.
+   * @param quality Compression quality (0-100). Defaults to 80.
    */
-  public async pickFile(): Promise<MediaData> {
-    return this.call<void, MediaData>(BridgeMethod.PickFile);
+  public async pickFromGallery(quality: number = 80): Promise<MediaData> {
+    return this.call<{ quality: number }, MediaData>(BridgeMethod.PickFromGallery, { quality });
+  }
+
+  /**
+   * Opens the native file picker.
+   * @param allowedExtensions List of allowed extensions (e.g., ['pdf', 'doc']).
+   */
+  public async pickFile(allowedExtensions: string[] = []): Promise<MediaData> {
+    return this.call<{ allowedExtensions: string[] }, MediaData>(BridgeMethod.PickFile, { allowedExtensions });
   }
 
   /**

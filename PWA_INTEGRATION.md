@@ -17,6 +17,9 @@ async function captureAndUpload() {
   try {
     const photo = await AWABridge.takePhoto(90);
     // photo.base64 or photo.path
+    
+    // Or pick from gallery
+    const galleryPhoto = await AWABridge.pickFromGallery(90);
   } catch (err) {
     if (err instanceof AWABridgeError) {
        console.error(`Native Error [${err.code}]: ${err.message}`);
@@ -66,6 +69,7 @@ const AWABridge = {
   
   // Media & Files
   takePhoto: (quality = 80) => AWABridge.call('media.camera', { quality }),
+  pickFromGallery: (quality = 80) => AWABridge.call('media.gallery', { quality }),
   pickFile: (allowedExtensions = []) => AWABridge.call('media.filePicker', { allowedExtensions }),
 
   // Location
@@ -86,23 +90,28 @@ Opens the device camera to capture an image.
 * **Params**: `{ "quality": number }`
 * **Returns**: A local file URI `file://...` or Base64 representation.
 
-#### 2. `media.filePicker`
+#### 2. `media.gallery`
+Opens the device gallery to select an image.
+* **Params**: `{ "quality": number }`
+* **Returns**: A local file URI `file://...` or Base64 representation.
+
+#### 3. `media.filePicker`
 Opens the native file picker to select a document.
 * **Params**: `{ "allowedExtensions": string[] }` (Optional, e.g., `["pdf", "doc"]`)
 * **Returns**: A local file URI `file://...`.
 
-#### 3. `location.current`
+#### 4. `location.current`
 Requests the current high-accuracy device location. Handles OS-level permissions automatically.
 * **Params**: None
 * **Returns**: `{ "latitude": number, "longitude": number, "accuracy": number }`
 * **Error**: Throws `PERMISSION_DENIED` if the user rejects location access.
 
-#### 4. `sms.send`
+#### 5. `sms.send`
 Opens the OS messaging composer pre-filled with the target number and message.
 * **Params**: `{ "number": string, "payload": string }`
 * **Returns**: `{ "success": boolean }`
 
-#### 5. `sms.receive`
+#### 6. `sms.receive`
 Listens for an incoming SMS (primarily for OTP autofill).
 * **Params**: None
 * **Returns**: `{ "body": string }` (The text of the received SMS).

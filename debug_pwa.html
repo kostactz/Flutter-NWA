@@ -80,6 +80,7 @@
         <div class="button-grid">
             <button onclick="handleAction('getLocation')">Get Location</button>
             <button onclick="handleAction('takePhoto')">Take Photo</button>
+            <button onclick="handleAction('pickFromGallery')">Pick from Gallery</button>
             <button onclick="handleAction('pickFile')">Pick File</button>
         </div>
     </div>
@@ -143,6 +144,7 @@
             try {
                 await AWABridge.call(method === 'getLocation' ? 'location.current' : 
                                    method === 'takePhoto' ? 'media.camera' : 
+                                   method === 'pickFromGallery' ? 'media.gallery' : 
                                    method === 'pickFile' ? 'media.filePicker' : 'sms.receive');
             } catch (e) {}
         }
