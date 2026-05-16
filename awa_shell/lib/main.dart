@@ -138,20 +138,21 @@ class _AWAShellScreenState extends State<AWAShellScreen> {
             ),
             if (_showDebugOverlay) const DebugOverlay(),
             // Invisible gesture detector on top for secret tap
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 50, // Top 50 pixels acts as the secret tap area
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: _handleSecretTap,
-                child: const SizedBox(
-                  height: 50,
-                  width: double.infinity,
+            if (kDebugMode)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 50, // Top 50 pixels acts as the secret tap area
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: _handleSecretTap,
+                  child: const SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
