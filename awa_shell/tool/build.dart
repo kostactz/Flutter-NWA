@@ -103,20 +103,7 @@ flutter_launcher_icons:
   await pubspecFile.writeAsString(pubspecContent);
 
   // 3. Android Mutators
-  print('==> Mutating Android files...');
-  final buildGradleFile = File('android/app/build.gradle.kts');
-  if (await buildGradleFile.exists()) {
-    String gradleContent = await buildGradleFile.readAsString();
-    gradleContent = gradleContent.replaceAll(
-      RegExp(r'namespace\s*=\s*".*"'),
-      'namespace = "$packageName"',
-    );
-    gradleContent = gradleContent.replaceAll(
-      RegExp(r'applicationId\s*=\s*".*"'),
-      'applicationId = "$packageName"',
-    );
-    await buildGradleFile.writeAsString(gradleContent);
-  }
+  print('==> Mutating Android files (permissions only)...');
 
   final manifestFile = File('android/app/src/main/AndroidManifest.xml');
   if (await manifestFile.exists()) {
@@ -156,16 +143,7 @@ flutter_launcher_icons:
   }
 
   // 4. iOS Mutators
-  print('==> Mutating iOS files...');
-  final pbxprojFile = File('ios/Runner.xcodeproj/project.pbxproj');
-  if (await pbxprojFile.exists()) {
-    String pbxContent = await pbxprojFile.readAsString();
-    pbxContent = pbxContent.replaceAll(
-      RegExp(r'PRODUCT_BUNDLE_IDENTIFIER\s*=\s*.*?;'),
-      'PRODUCT_BUNDLE_IDENTIFIER = $packageName;',
-    );
-    await pbxprojFile.writeAsString(pbxContent);
-  }
+  print('==> Mutating iOS files (permissions only)...');
 
   final infoPlistFile = File('ios/Runner/Info.plist');
   if (await infoPlistFile.exists()) {
@@ -241,6 +219,8 @@ storeFile=$keystorePath
       buildTarget,
       '--release',
       '--dart-define=PWA_URL=$pwaUrl',
+      '--dart-define=APP_ID=$packageName',
+      '--dart-define=APP_NAME=$appName',
     ]);
     await stdout.addStream(process.stdout);
     await stderr.addStream(process.stderr);
