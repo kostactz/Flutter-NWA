@@ -1,8 +1,22 @@
+import java.util.Base64
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+val dartEnvironmentVariables = if (project.hasProperty("dart-defines")) {
+    (project.property("dart-defines") as String)
+        .split(",")
+        .associate { entry ->
+            val decoded = String(Base64.getDecoder().decode(entry), Charsets.UTF_8)
+            val parts = decoded.split("=")
+            parts.first() to parts.drop(1).joinToString("=")
+        }
+} else {
+    emptyMap<String, String>()
 }
 
 android {
@@ -15,13 +29,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.awa_shell"
+        applicationId = dartEnvironmentVariables["APP_ID"] ?: "com.example.awa_shell"
+        resValue("string", "app_name", dartEnvironmentVariables["APP_NAME"] ?: "awa_shell")
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

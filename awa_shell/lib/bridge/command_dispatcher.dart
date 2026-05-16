@@ -23,7 +23,9 @@ class CommandDispatcher {
       return errorResp;
     }
 
-    final Map<String, dynamic> requestData = Map<String, dynamic>.from(args[0] as Map);
+    final Map<String, dynamic> requestData = Map<String, dynamic>.from(
+      args[0] as Map,
+    );
     final request = BridgeRequest.fromJson(requestData);
 
     _logger.logRequest(request.method, requestData);
@@ -39,6 +41,9 @@ class CommandDispatcher {
           break;
         case 'media.camera':
           result = await MediaService.takePhoto(request.params);
+          break;
+        case 'media.gallery':
+          result = await MediaService.pickFromGallery(request.params);
           break;
         case 'media.filePicker':
           result = await MediaService.pickFile(request.params);
@@ -61,29 +66,20 @@ class CommandDispatcher {
           return responseData;
       }
 
-      responseData = BridgeResponse(
-        id: request.id,
-        data: result,
-      ).toJson();
+      responseData = BridgeResponse(id: request.id, data: result).toJson();
       _logger.logResponse(request.method, responseData);
       return responseData;
     } on BridgeException catch (e) {
       responseData = BridgeResponse(
         id: request.id,
-        error: {
-          'code': e.code,
-          'message': e.message,
-        },
+        error: {'code': e.code, 'message': e.message},
       ).toJson();
       _logger.logResponse(request.method, responseData);
       return responseData;
     } catch (e) {
       responseData = BridgeResponse(
         id: request.id,
-        error: {
-          'code': 'INTERNAL_ERROR',
-          'message': e.toString(),
-        },
+        error: {'code': 'INTERNAL_ERROR', 'message': e.toString()},
       ).toJson();
       _logger.logResponse(request.method, responseData);
       return responseData;

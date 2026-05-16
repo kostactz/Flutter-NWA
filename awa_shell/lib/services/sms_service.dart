@@ -16,10 +16,28 @@ class SmsService {
       );
     }
 
+    if (Platform.isAndroid) {
+      final Telephony telephony = Telephony.instance;
+      bool? permissionsGranted = await telephony.requestPhoneAndSmsPermissions;
+      if (permissionsGranted == null || !permissionsGranted) {
+        throw BridgeException(
+          code: 'PERMISSION_DENIED',
+          message: 'SMS permissions denied',
+        );
+      }
+
+      await telephony.sendSms(
+        to: number,
+        message: payload,
+      );
+      return {'status': 'success', 'method': 'direct'};
+    }
+
+    // Fallback to composer for iOS/other platforms
     final Uri uri = Uri.parse('sms:$number?body=${Uri.encodeComponent(payload)}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
-      return {'status': 'success'};
+      return {'status': 'success', 'method': 'composer'};
     } else {
       throw BridgeException(
         code: 'LAUNCH_FAILED',

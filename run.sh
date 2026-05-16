@@ -3,40 +3,38 @@
 # run.sh - Script to run or build the AWA Shell
 
 show_help() {
-  echo "Usage: ./run.sh [run|build] [debug|release] [PWA_URL]"
-  echo "Example: ./run.sh run debug https://my-pwa.com"
-  echo "Example: ./run.sh build release https://my-pwa.com"
+  echo "Usage: ./run.sh run [debug|release] [PWA_URL]"
+  echo "       ./run.sh build release [OPTIONS]"
+  echo ""
+  echo "Options for build:"
+  echo "  --platform=android|ios"
+  echo "  --pwa-url=https://..."
+  echo "  --package-name=com.company.app"
+  echo "  --app-name=\"My PWA\""
+  echo "  --version=\"1.0.0+1\""
+  echo "  --icon-url=\"https://.../icon.png\""
+  echo "  --permissions=\"camera,gallery,files,location,sms\""
+  echo "  --keystore=\"/path/to/keystore\""
+  echo "  --keystore-password=\"pass\""
+  echo "  --key-alias=\"alias\""
+  echo "  --key-password=\"pass\""
 }
 
-if [ "$#" -lt 2 ]; then
+if [ "$#" -lt 1 ]; then
   show_help
   exit 1
 fi
 
 ACTION=$1
-MODE=$2
-PWA_URL=$3
-
-if [ "$ACTION" != "run" ] && [ "$ACTION" != "build" ]; then
-  echo "Invalid action: $ACTION. Must be 'run' or 'build'."
-  show_help
-  exit 1
-fi
-
-if [ "$MODE" != "debug" ] && [ "$MODE" != "release" ]; then
-  echo "Invalid mode: $MODE. Must be 'debug' or 'release'."
-  show_help
-  exit 1
-fi
-
-cd awa_shell || exit 1
-
-DART_DEFINES=""
-if [ -n "$PWA_URL" ]; then
-  DART_DEFINES="--dart-define=PWA_URL=$PWA_URL"
-fi
 
 if [ "$ACTION" == "run" ]; then
+  MODE=$2
+  PWA_URL=$3
+  cd awa_shell || exit 1
+  DART_DEFINES=""
+  if [ -n "$PWA_URL" ]; then
+    DART_DEFINES="--dart-define=PWA_URL=$PWA_URL"
+  fi
   if [ "$MODE" == "debug" ]; then
     echo "Running in debug mode..."
     flutter run --debug $DART_DEFINES
@@ -45,13 +43,19 @@ if [ "$ACTION" == "run" ]; then
     flutter run --release $DART_DEFINES
   fi
 elif [ "$ACTION" == "build" ]; then
-  if [ "$MODE" == "debug" ]; then
-    echo "Building APK in debug mode..."
-    flutter build apk --debug $DART_DEFINES
-    # Can also build ios: flutter build ios --debug $DART_DEFINES
-  else
-    echo "Building APK in release mode..."
-    flutter build apk --release $DART_DEFINES
-    # Can also build ios: flutter build ios --release $DART_DEFINES
+  MODE=$2
+  if [ "$MODE" != "release" ]; then
+    echo "Build action currently supports 'release' mode only via the White-Label Engine."
+    show_help
+    exit 1
   fi
+  shift 2 # Remove 'build' and 'release' from args
+  cd awa_shell || exit 1
+  
+  # Forward all remaining arguments to the Dart CLI builder
+  dart run tool/build.dart "$@"
+else
+  echo "Invalid action: $ACTION. Must be 'run' or 'build'."
+  show_help
+  exit 1
 fi
