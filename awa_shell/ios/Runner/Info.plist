@@ -72,5 +72,9 @@
 	<string>AWA requires photo library access to select photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>AWA requires location access to fetch high-accuracy GPS coordinates.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>sms</string>
+	</array>
 </dict>
 </plist>

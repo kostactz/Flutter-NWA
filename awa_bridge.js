@@ -32,6 +32,7 @@ const AWABridge = {
 
   // Helper methods
   takePhoto: (quality = 80) => AWABridge.call('media.camera', { quality }),
+  pickFromGallery: (quality = 80) => AWABridge.call('media.gallery', { quality }),
   pickFile: (allowedExtensions = []) => AWABridge.call('media.filePicker', { allowedExtensions }),
   getLocation: () => AWABridge.call('location.current'),
   sendSms: (number, text) => AWABridge.call('sms.send', { number, payload: text }),
